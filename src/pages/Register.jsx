@@ -1,58 +1,107 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Await, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import ani from '../assets/ani.png';
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import axios from 'axios';
+import { registerRoute } from '../utils/APIRoutes';
 
 const Register = () => {
 
+  const [values, setValues] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
 
-  const handleSubmit = (event) => {
+  })
+
+  const toastOptions = {
+    position: "bottom-right",
+    autoClose: 8000,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "dark",
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    alert("from")
+    if(handleValidation()) {
+      const { username, email, password, confirmPassword } = values;
+        const {data} = await axios.post(registerRoute)
+    
+    }
+  };
+
+  const handleValidation = () => {
+    const { username, email, password, confirmPassword } = values;
+    if (password !== confirmPassword) {
+      toast.error("password and confirm password should be same.",
+        toastOptions
+      );
+      return false;
+    } else if (username.length < 3) {
+      toast.error("User Name should be greater than 3.",
+        toastOptions
+      )
+      return false;
+    }
+    else if (password.length < 8) {
+      toast.error("Password should be equal or greater than 8 characters.",
+        toastOptions
+      )
+      return false;
+    }else if (email === "" ) {
+      toast.error("Email is  required", toastOptions);
+      return false;
+    }
+    return true;
   };
 
   const handleChange = (event) => {
-  
+    setValues({ ...values, [event.target.name]: event.target.value })
   };
 
 
 
   return (
     <>
-     <FormContainer>
-      <form onSubmit={(event)=> handleSubmit(event)}>
-        <div className='logo'>
-          <img src={ ani } />
-          <h1>ANI-anonymous new idea</h1>
-        </div>
-        <input
-          type='text'
-          placeholder='User Name'
-          name='username'
-          onChange={(e) => handleChange(e)} 
-        />
-        <input
-          type='email'
-          placeholder='Email'
-          name='email'
-          onChange={(e) => handleChange(e)} 
-        />
-        <input
-          type='password'
-          placeholder='Password'
-          name='password'
-          onChange={(e) => handleChange(e)} 
-        />
-        <input
-          type='password'
-          placeholder='Confirm Password'
-          name='confirmPassword'
-          onChange={(e) => handleChange(e)} 
-        />
-        <button type='submit'>Creat User</button>
-        <span>Already have an account ? <Link to="/login">Log in</Link></span>
-      </form>
-    </FormContainer>
+      <FormContainer>
+        <form onSubmit={(event) => handleSubmit(event)}>
+          <div className='logo'>
+            <img src={ani} />
+            <h1>ANI-anonymous new idea</h1>
+          </div>
+          <input
+            type='text'
+            placeholder='User Name'
+            name='username'
+            onChange={(e) => handleChange(e)}
+          />
+          <input
+            type='email'
+            placeholder='Email'
+            name='email'
+            onChange={(e) => handleChange(e)}
+          />
+          <input
+            type='password'
+            placeholder='Password'
+            name='password'
+            onChange={(e) => handleChange(e)}
+          />
+          <input
+            type='password'
+            placeholder='Confirm Password'
+            name='confirmPassword'
+            onChange={(e) => handleChange(e)}
+          />
+          <button type='submit'>Creat User</button>
+          <span>Already have an account ? <Link to="/login">Log in</Link></span>
+        </form>
+      </FormContainer>
+      <ToastContainer />
     </>
   );
 }
